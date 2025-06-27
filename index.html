@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Forest Map</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+  
+  <meta name="description" content="This visualization uses Perlin noise to generate a virtual forest with the same species makeup of the City of Pittsburgh trees in Autumn.">
+  <link rel="canonical" href="https://forestmap-pittsburgh.glitch.me/">
+  <meta property="og:title" content="What does Pittsburgh look like in the fall? A forest map visualization.">
+  <meta property="og:description" content="This visualization uses Perlin noise to generate a virtual forest with the same species makeup of the City of Pittsburgh trees in Autumn.">
+  <meta property="og:url" content="https://forestmap-pittsburgh.glitch.me/">
+  <meta property="og:site_name" content="Pittsburgh Forestmap">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://cdn.glitch.global/f0c7366a-a54a-4dcc-b5ce-225158184587/test%20(1).png?v=1669948944883" >
+  <link rel="icon" type="image/x-icon" href="https://cdn.glitch.global/f0c7366a-a54a-4dcc-b5ce-225158184587/favicon.ico?v=1669949649852">
+  
+  
+</head>
+<body>
+	<div class="container">
+		<h1>What does Pittsburgh look like in the fall? </h1>
+    <h3>
+      A forest map visualization of forest-related data.
+    </h3>
+    <p>
+    A <em>treemap visualization</em> presents data hierachically. A <em>forestmap visualization</em> presents data biologically. This visualization plots a dataset by generating a virtual forest with the same species makeup of the city of Pittsburgh trees in autumn.  
+    </p>
+    <div id="viz"></div>
+    <a id="mylink" href="/">Download as SVG</a>     
+    <p>
+     <h3>
+       Source
+    </h3> 
+      <ul>
+        <li>Tree population data is from <a href="https://waterlandlife.org/wp-content/uploads/2018/02/i-Tree-Eco-Pittsburgh.pdf">Pittsburgh i-Tree Ecosystem Analysis</a></li>
+        <li>Leaf color data is from <a href="https://mortonarb.org/search/?search_string=">The Morton Arboretum</a></li>
+      </ul>
+    </p>
+	</div>
+	<!-- Add Scripts Here -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<script src="forestmap.js"></script>
+
+  <script>
+    function saveSvg(svgEl, name) {
+      svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      var svgData = svgEl.outerHTML;
+      var preface = '<?xml version="1.0" standalone="no"?>\r\n';
+      var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});
+      var svgUrl = URL.createObjectURL(svgBlob);
+      var downloadLink = document.createElement("a");
+      downloadLink.href = svgUrl;
+      downloadLink.download = name;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+  }
+    
+    
+     // Wait for the page to load first
+        window.onload = function() {
+
+          //Get a reference to the link on the page
+          // with an id of "mylink"
+          var a = document.getElementById("mylink");
+
+          //Set code to run when the link is clicked
+          // by assigning a function to "onclick"
+          a.onclick = function() {
+            var svg = document.getElementById("viz").firstChild;
+            saveSvg(svg, "test");
+            
+            return false;
+          }
+        }
+    
+    
+  </script>
+</body>
+</html>
