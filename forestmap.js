@@ -211,11 +211,7 @@ const simulateForest = (data) => {
     
     
   }
-  
-
-
-  
-  
+    
   
   
 }
@@ -232,29 +228,21 @@ const analyzeForest = (board) => {
       else {
         myColors[tree.leafColor]++;
       }
-      
- //   augmentWithNeighborhood(tree, board);
     
   }
-  
-  
+   
   return myColors;
 }
 
-
-
-d3.csv("../leaf-data.csv").then(data => {
+d3.csv("./leaf-data.csv").then(data => {
   //Species Name,Leaf Color,% Leaf Biomass
   const leafData =  data.map(datum => {return {
     speciesName: datum["Species Name"],
     leafColor: datum["Leaf Color"],
     appoximateLeaves: (Math.round(parseFloat(datum["% Leaf Biomass"])/100*totalTiles))
-  }}); //.sort((a, b) => (a.appoximateLeaves < b.appoximateLeaves) ? 1 : -1);
-  
-
+  }}); 
   
   const simulationResult = simulateForest(leafData);
-  
   
   const myColors = analyzeForest(simulationResult);
 
