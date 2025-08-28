@@ -48,34 +48,14 @@ a {
   max-width: 1200px;
 }
 
-.intro {
-  margin-bottom: 30px;
-}
-.source,
-.note {
-  font-size: 15px;
-}
-.source {
-  margin-top: 30px;
-}
-.note {
-  margin: 30px 0 60px;
-}
 
 .tooltip {
   color: black;
   background-color: white;
-  background: white;
   align-content: center;
   margin-right: 10%;
   margin-left: 10%;
   position: absolute;
-}
-
-.tooltip.show {
-    opacity: 1;
-    background-color: white;
-    border: green;
 }
 
 

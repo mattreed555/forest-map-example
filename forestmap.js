@@ -1,7 +1,9 @@
-const matrixSize = 20;
-const squareSize = 20;
-const totalTiles = matrixSize * matrixSize;
-const howLongToWander = totalTiles * 15;
+const MATRIX_SIZE = 20;
+const SQUARE_SIZE = 20;
+const TOTAL_TILES = MATRIX_SIZE * MATRIX_SIZE;
+const HOW_LONG_TO_WANDER = TOTAL_TILES * 15;
+const NUM_DIRECTIONS = 8;
+const WANDER_MULTIPLIER = 15;
 
 // we want to have the vis be stable so use seedrandom library to keep the output the same every refresh
 Math.seedrandom('For KC');
@@ -15,24 +17,22 @@ var M = 4294967296,
     Z = Math.floor(Math.random() * M);
 
 const getRandom = () => {
-  
-   Z = (A * Z + C) % M;
+  Z = (A * Z + C) % M;
   return Math.abs(Z / M - 0.5);
-  
-}
+};
 
 const colorMap = {
   yellow: "yellow",
-  "yellow-brown":"goldenrod",
-  "orange-red":"orangered",
-  red:"firebrick",
-  evergreen:"forestgreen",
-  green:"limegreen",
-  brown:"saddlebrown",
-  purple:"rgb(63,3,63)",
-}
+  "yellow-brown": "goldenrod",
+  "orange-red": "orangered",
+  red: "firebrick",
+  evergreen: "forestgreen",
+  green: "limegreen",
+  brown: "saddlebrown",
+  purple: "rgb(63,3,63)"
+};
 
-const width = matrixSize * squareSize; 
+const width = MATRIX_SIZE * SQUARE_SIZE; 
 const height = width; 
 
 const createMatrix = (data) => {
@@ -84,28 +84,28 @@ const createMatrix = (data) => {
   }
   
   treeGroups.append('rect')
-          .attr('width', squareSize)
-          .attr('height', squareSize)
-          .attr('x', d => d.x * squareSize)
-          .attr('y', d => d.y * squareSize)
-          .attr('fill', d=> colorMap[d.leafColor])
-          .text(d => d.speciesName ) 
-          .on("mouseover", mouseover)
-          .on("mousemove", mousemove)
-          .on("mouseleave", mouseleave);
+    .attr('width', SQUARE_SIZE)
+    .attr('height', SQUARE_SIZE)
+    .attr('x', d => d.x * SQUARE_SIZE)
+    .attr('y', d => d.y * SQUARE_SIZE)
+    .attr('fill', d => colorMap[d.leafColor])
+    .text(d => d.speciesName)
+    .on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseleave", mouseleave);
   
   
   
 }
 
-const goLeft = x => (x==0?(matrixSize-1):x - 1);
-const goRight = x => (x==(matrixSize-1)?0:x + 1);
-const goUp = y => (y==0?(matrixSize-1):y - 1);
-const goDown = y => (y==(matrixSize-1)?0:y + 1);
+const goLeft = x => (x === 0 ? (MATRIX_SIZE - 1) : x - 1);
+const goRight = x => (x === (MATRIX_SIZE - 1) ? 0 : x + 1);
+const goUp = y => (y === 0 ? (MATRIX_SIZE - 1) : y - 1);
+const goDown = y => (y === (MATRIX_SIZE - 1) ? 0 : y + 1);
 
 const randomWalk = (x, y) => {
   
-  const dir = Math.floor(getRandom() * 8);
+  const dir = Math.floor(getRandom() * NUM_DIRECTIONS);
   
 
   const staySame = i => i;
@@ -132,35 +132,21 @@ const randomWalk = (x, y) => {
   
 }
 
-const isFree = (x, y, board) => {
-  const hasLocation = board.find(f => f.x == x && f.y == y);
-  return hasLocation == undefined;
+const isFree = (x, y, grid) => {
+  return grid[y][x] === null;
 };
 
-const isMySpecies = (x, y, speciesName, board) => {
-  
-  const location = board.find(f => f.x == x && f.y == y);
-  
-  if (location == undefined) return false;
-  
-  return location.speciesName == speciesName;
-  
+const isMySpecies = (x, y, speciesName, grid) => {
+  const location = grid[y][x];
+  if (location === null) return false;
+  return location.speciesName === speciesName;
 };
 
-const augmentWithNeighborhood = (tree, board) => {
 
-
-  tree.topSameSpecies = isMySpecies(tree.x, goUp(tree.y), tree.speciesName, board);
-  tree.bottomSameSpecies = isMySpecies(tree.x, goDown(tree.y), tree.speciesName, board);
-  tree.leftSameSpecies = isMySpecies(goLeft(tree.x), tree.y, tree.speciesName, board);
-  tree.rightSameSpecies = isMySpecies(goRight(tree.x), tree.y, tree.speciesName, board);
-  
-};
-
-const randomWalkToFree = (x, y, board) => {
-  let candidate = {x:x,y:y};
-  for(let i = 0; i < howLongToWander; i++) {
-    if (isFree(candidate.x, candidate.y, board)) {
+const randomWalkToFree = (x, y, grid) => {
+  let candidate = {x: x, y: y};
+  for(let i = 0; i < HOW_LONG_TO_WANDER; i++) {
+    if (isFree(candidate.x, candidate.y, grid)) {
       return candidate;
     }
     candidate = randomWalk(candidate.x, candidate.y);
@@ -169,18 +155,22 @@ const randomWalkToFree = (x, y, board) => {
 }
 
 const getRandomLocation = () => {
-  const x = Math.floor(getRandom() * matrixSize);
-  const y = Math.floor(getRandom() * matrixSize);
+  const x = Math.floor(getRandom() * MATRIX_SIZE);
+  const y = Math.floor(getRandom() * MATRIX_SIZE);
   return {x:x,y:y};
 }
 
-const plantTree = (board, freeLocation, species) => {
- board.push({ x: freeLocation.x, y: freeLocation.y, leafColor:species.leafColor, speciesName:species.speciesName });
+const plantTree = (board, grid, freeLocation, species) => {
+  const tree = { x: freeLocation.x, y: freeLocation.y, leafColor: species.leafColor, speciesName: species.speciesName };
+  board.push(tree);
+  grid[freeLocation.y][freeLocation.x] = tree;
 }
 
 const simulateForest = (data) => {
   
   let board = [];
+  // Create 2D lookup grid for performance
+  const grid = Array(MATRIX_SIZE).fill(null).map(() => Array(MATRIX_SIZE).fill(null));
   const speciesData = {};
   
   
@@ -189,21 +179,21 @@ const simulateForest = (data) => {
   for (const species of data) {
   
     const startingPoint = getRandomLocation();
-    let freeLocation = randomWalkToFree(startingPoint.x, startingPoint.y, board);
-    plantTree(board, freeLocation, species);
+    let freeLocation = randomWalkToFree(startingPoint.x, startingPoint.y, grid);
+    plantTree(board, grid, freeLocation, species);
     
-    console.log(species.appoximateLeaves);
+    console.log(species.approximateLeaves);
     
-    for (let i = 0; i < species.appoximateLeaves; i++) {
+    for (let i = 0; i < species.approximateLeaves; i++) {
  
        
-        let newfreeLocation = randomWalkToFree(freeLocation.x, freeLocation.y, board);
+        let newfreeLocation = randomWalkToFree(freeLocation.x, freeLocation.y, grid);
         
         // leave once we run out of tiles
         if(newfreeLocation == undefined) {
           return board;
         } 
-     plantTree(board, newfreeLocation, species);
+     plantTree(board, grid, newfreeLocation, species);
    
       freeLocation = newfreeLocation;
           
@@ -235,12 +225,14 @@ const analyzeForest = (board) => {
 }
 
 d3.csv("./leaf-data.csv").then(data => {
-  //Species Name,Leaf Color,% Leaf Biomass
-  const leafData =  data.map(datum => {return {
-    speciesName: datum["Species Name"],
-    leafColor: datum["Leaf Color"],
-    appoximateLeaves: (Math.round(parseFloat(datum["% Leaf Biomass"])/100*totalTiles))
-  }}); 
+  // Species Name,Leaf Color,% Leaf Biomass
+  const leafData = data.map(datum => {
+    return {
+      speciesName: datum["Species Name"],
+      leafColor: datum["Leaf Color"],
+      approximateLeaves: Math.round(parseFloat(datum["% Leaf Biomass"]) / 100 * TOTAL_TILES)
+    };
+  }); 
   
   const simulationResult = simulateForest(leafData);
   
@@ -250,5 +242,7 @@ d3.csv("./leaf-data.csv").then(data => {
   
   createMatrix(simulationResult);
 
-
+}).catch(error => {
+  console.error("Failed to load tree data:", error);
+  document.getElementById("viz").innerHTML = "<p>Error loading visualization data. Please check that leaf-data.csv is available.</p>";
 });
